@@ -14,7 +14,7 @@ if sys.platform == "win32":
     base = "Win32GUI"
     
 executables = [
-    Executable('qserialfc.py', base=base, targetName = 'serialfc.exe')
+    Executable('qserialfc.py', base=base)
 ]
 
 setup(name='qserialfc',
