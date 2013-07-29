@@ -207,6 +207,12 @@ class FTermination(FBooleanAttribute):
         super(FTermination, self).__init__("Termination", "termination", port_widget)
         
         
+class F9Bit(FBooleanAttribute):
+
+    def __init__(self, port_widget=None):
+        super(F9Bit, self).__init__("9-Bit", "nine_bit", port_widget)
+
+
 class FEchoCancel(FBooleanAttribute):
 
     def __init__(self, port_widget=None):
