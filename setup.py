@@ -18,6 +18,6 @@ executables = [
 ]
 
 setup(name='qserialfc',
-      version = '1.1',
+      version = '1.1.0',
       options = dict(build_exe = buildOptions),
       executables = executables)
