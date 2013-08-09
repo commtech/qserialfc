@@ -1,3 +1,6 @@
+import os
+import re
+
 from PySide.QtCore import Signal, Qt
 from PySide.QtGui import QHBoxLayout, QCheckBox, QLabel, QLineEdit, QComboBox, QSpinBox, QRadioButton, QWidget, QMessageBox
 
@@ -5,7 +8,9 @@ from serial import SerialException
 from serial.tools import list_ports
 
 from serialfc import *
-import win32api
+
+if os.name == 'nt':
+    import win32api
 
 
 class FHBoxLayout(QWidget):
@@ -51,8 +56,17 @@ class FPortName(FHBoxLayout):
             self.port = None
             
         try:
-            self.port = Port(self.combo_box.currentText())
+            current_text = self.combo_box.currentText()
+            if os.name == 'nt':
+                self.port = Port(current_text)
+            else:
+                ttyS_num = re.sub("[^0-9]", "", current_text)
+                serialfc_num = int(ttyS_num) - 4
+                serialfc_name = '/dev/serialfc{}'.format(serialfc_num)
+
+                self.port = Port(current_text, serialfc_name)
         except IOError as e:
+            print(e)
             # pySerial doesn't seem to correctly set any of it's 
             # attributes so we can't check for an already open error specifically            
             msgBox = QMessageBox()
@@ -93,7 +107,7 @@ class FPortName(FHBoxLayout):
         self.apply_changes.emit(self.port)
     
 
-class PortChangedTracker:
+class PortChangedTracker(object):
 
     def __init__(self, port_widget):
         super(PortChangedTracker, self).__init__()
@@ -110,12 +124,9 @@ class PortChangedTracker:
         try:
             # Call port_changed on child class
             self.port_changed(port)
-        except win32api.error as e:
+        except AttributeError as e:
             # This functionality isn't supported on this port
-            if e.winerror == 50:
-                self.unsupported()
-            else:
-                raise
+            self.unsupported()
         except: # Raise any random unknown exceptions for debugging
             raise
         else:
@@ -236,7 +247,7 @@ class FClockFrequency(FHBoxLayout, PortChangedTracker):
         
         # This disabled the widget for the PCIe card
         if card_type == CARD_TYPE_PCIe:
-            raise win32api.error(50)
+            raise AttributeError()
             
         self.line_edit.setText('')
 
