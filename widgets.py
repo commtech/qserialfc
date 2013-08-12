@@ -4,7 +4,6 @@ import re
 from PySide.QtCore import Signal, Qt
 from PySide.QtGui import *
 
-from serial import SerialException
 from serial.tools import list_ports
 
 from serialfc import *
