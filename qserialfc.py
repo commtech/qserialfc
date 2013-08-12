@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
- 
+
 import sys
 
 from PySide.QtCore import Signal
@@ -8,13 +8,13 @@ from PySide.QtGui import QApplication, QDialog, QDialogButtonBox, QVBoxLayout
 
 from widgets import *
 
-           
+
 class PortForm(QDialog):
     apply_changes = Signal()
-    
+
     def __init__(self):
         super(PortForm, self).__init__()
-        
+
         self.port_name = FPortName(self.apply_changes)
         self.sample_rate = FSampleRate(self.port_name)
         self.clock_frequency = FClockFrequency(self.port_name)
@@ -28,7 +28,7 @@ class PortForm(QDialog):
         self.frame_length = FFrameLength(self.port_name)
         self.protocol = FProtocol(self.port_name)
         self.buttons = QDialogButtonBox(QDialogButtonBox.Apply | QDialogButtonBox.Ok | QDialogButtonBox.Close)
-        
+
         self.sample_rate.setEnabled(False)
         self.clock_frequency.setEnabled(False)
         self.tx_trigger_lvl.setEnabled(False)
@@ -41,11 +41,11 @@ class PortForm(QDialog):
         self.frame_length.setEnabled(False)
         self.protocol.setEnabled(False)
         self.buttons = QDialogButtonBox(QDialogButtonBox.Apply | QDialogButtonBox.Ok | QDialogButtonBox.Close)
-        
-        
+
+
         # Create layout and add widgets
         layout = QVBoxLayout()
-        
+
         layout.addWidget(self.port_name)
         layout.addWidget(self.sample_rate)
         layout.addWidget(self.clock_frequency)
@@ -59,37 +59,37 @@ class PortForm(QDialog):
         layout.addWidget(self.frame_length)
         layout.addWidget(self.protocol)
         layout.addWidget(self.buttons)
-        
+
         # Set dialog layout
         self.setLayout(layout)
-        
+
         self.buttons.button(QDialogButtonBox.Apply).clicked.connect(self.apply_clicked);
         self.buttons.accepted.connect(self.ok_clicked)
         self.buttons.rejected.connect(self.close_clicked)
-        
+
         self.setFixedSize(self.sizeHint())
         self.setWindowTitle('Fastcom Serial Settings')
-        
+
     def apply_clicked(self):
         self.apply_changes.emit()
-    
+
     def ok_clicked(self):
         self.apply_changes.emit()
         self.close()
-        
+
     def close_clicked(self):
         self.close()
- 
+
 if __name__ == '__main__':
     # Create the Qt Application
     app = QApplication(sys.argv)
-    
+
     # Create and show the form
     form = PortForm()
     form.show()
-    
+
     # Try and set the default port after the form is already showing
     form.port_name.combo_box.setCurrentIndex(0)
-    
+
     # Run the main Qt loop
     sys.exit(app.exec_())
