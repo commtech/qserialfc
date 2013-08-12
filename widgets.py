@@ -22,6 +22,13 @@ class FHBoxLayout(QWidget):
         self.layout.addWidget(widget)
 
 
+def is_serialfc_port(filename):
+        if filename.find("serialfc") != -1:
+            return True
+        else:
+            return False
+
+
 class FPortName(FHBoxLayout):
     port_changed = Signal(Port)
     apply_changes = Signal(Port)
@@ -34,7 +41,12 @@ class FPortName(FHBoxLayout):
         self.label = QLabel("Port")
         self.combo_box = QComboBox()
 
-        port_names = sorted([port[0] for port in list_ports.comports()])
+        if os.name == 'nt':
+            port_names = sorted([port[0] for port in list_ports.comports()])
+        else:
+            dev_nodes = os.listdir("/dev/")
+            port_names = sorted(list(filter(is_serialfc_port, dev_nodes)))
+
         self.combo_box.addItems(port_names)
         self.combo_box.setCurrentIndex(-1)
 
@@ -62,13 +74,12 @@ class FPortName(FHBoxLayout):
             if os.name == 'nt':
                 self.port = Port(current_text)
             else:
-                ttyS_num = re.sub("[^0-9]", "", current_text)
-                serialfc_num = int(ttyS_num) - 4
-                serialfc_name = '/dev/serialfc{}'.format(serialfc_num)
+                serialfc_num = re.sub("[^0-9]", "", current_text)
+                ttyS_num = int(serialfc_num) + 4
+                ttyS_name = '/dev/ttyS{}'.format(ttyS_num)
 
-                self.port = Port(current_text, serialfc_name)
-        except IOError as e:
-            print(e)
+                self.port = Port(ttyS_name, '/dev/{}'.format(current_text))
+        except IOError:
             """
             pySerial doesn't seem to correctly set any of it's
             attributes so we can't check for an already open error

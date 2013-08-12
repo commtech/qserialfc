@@ -93,7 +93,7 @@ if __name__ == '__main__':
     form.show()
 
     # Try and set the default port after the form is already showing
-    default_port = 'COM3' if os.name == 'nt' else '/dev/ttyS4'
+    default_port = 'COM3' if os.name == 'nt' else 'serialfc0'
     form.port_name.set_port(default_port)
 
     # Run the main Qt loop
