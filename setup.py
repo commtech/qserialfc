@@ -12,12 +12,12 @@ buildOptions = dict(packages = ['serialfc'], excludes = [], includes = ['re'])
 base = None
 if sys.platform == "win32":
     base = "Win32GUI"
-    
+
 executables = [
     Executable('qserialfc.py', base=base)
 ]
 
 setup(name='qserialfc',
-      version = '1.1.0',
+      version = '1.2.0',
       options = dict(build_exe = buildOptions),
       executables = executables)
