@@ -4,7 +4,7 @@ from cx_Freeze import setup, Executable
 
 # Dependencies are automatically detected, but it might need
 # fine tuning.
-buildOptions = dict(packages = ['serialfc'], excludes = [], includes = ['re'])
+buildOptions = dict(packages=['serialfc'], excludes=[], includes=['re'])
 
 
 # GUI applications require a different base on Windows (the default is for a
@@ -18,6 +18,6 @@ executables = [
 ]
 
 setup(name='qserialfc',
-      version = '1.2.0',
-      options = dict(build_exe = buildOptions),
-      executables = executables)
+      version='1.2.0',
+      options=dict(build_exe=buildOptions),
+      executables=executables)
