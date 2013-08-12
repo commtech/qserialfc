@@ -120,7 +120,7 @@ class PortChangedTracker(object):
         try:
             # Call port_changed on child class
             self.port_changed(port)
-        except AttributeError as e:
+        except AttributeError:
             # This functionality isn't supported on this port
             self.unsupported()
         except: # Raise any random unknown exceptions for debugging
