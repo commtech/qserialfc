@@ -9,9 +9,6 @@ from serial.tools import list_ports
 
 from serialfc import *
 
-if os.name == 'nt':
-    import win32api
-
 
 class FHBoxLayout(QWidget):
 
