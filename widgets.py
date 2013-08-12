@@ -46,6 +46,12 @@ class FPortName(FHBoxLayout):
         self.addWidget(self.label)
         self.addWidget(self.combo_box)
 
+    def set_port(self, port_name):
+        index = self.combo_box.findText(port_name)
+
+        if index >= 0:
+            self.combo_box.setCurrentIndex(index)
+
     def currentIndexChanged(self):
         if self.port:
             self.port.close()

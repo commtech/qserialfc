@@ -93,7 +93,8 @@ if __name__ == '__main__':
     form.show()
 
     # Try and set the default port after the form is already showing
-    form.port_name.combo_box.setCurrentIndex(0)
+    default_port = 'COM3' if os.name == 'nt' else '/dev/ttyS4'
+    form.port_name.set_port(default_port)
 
     # Run the main Qt loop
     sys.exit(app.exec_())
