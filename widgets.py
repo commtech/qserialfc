@@ -142,12 +142,10 @@ class PortChangedTracker(object):
     def supported(self):
         self.setEnabled(True)
         self.setToolTip('')
-        #self.setVisible(True)
         
     def unsupported(self):
         self.setEnabled(False)
         self.setToolTip('This feature is not supported on this port.')
-        #self.setVisible(False)
 
     
 class FTriggerLevel(FHBoxLayout, PortChangedTracker):
