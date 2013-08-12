@@ -27,7 +27,9 @@ class PortForm(QDialog):
         self.external_transmit = FExternalTransmit(self.port_name)
         self.frame_length = FFrameLength(self.port_name)
         self.protocol = FProtocol(self.port_name)
-        self.buttons = QDialogButtonBox(QDialogButtonBox.Apply | QDialogButtonBox.Ok | QDialogButtonBox.Close)
+        self.buttons = QDialogButtonBox(QDialogButtonBox.Apply |
+                                        QDialogButtonBox.Ok |
+                                        QDialogButtonBox.Close)
 
         self.sample_rate.setEnabled(False)
         self.clock_frequency.setEnabled(False)
@@ -40,8 +42,9 @@ class PortForm(QDialog):
         self.external_transmit.setEnabled(False)
         self.frame_length.setEnabled(False)
         self.protocol.setEnabled(False)
-        self.buttons = QDialogButtonBox(QDialogButtonBox.Apply | QDialogButtonBox.Ok | QDialogButtonBox.Close)
-
+        self.buttons = QDialogButtonBox(QDialogButtonBox.Apply |
+                                        QDialogButtonBox.Ok |
+                                        QDialogButtonBox.Close)
 
         # Create layout and add widgets
         layout = QVBoxLayout()
@@ -63,7 +66,8 @@ class PortForm(QDialog):
         # Set dialog layout
         self.setLayout(layout)
 
-        self.buttons.button(QDialogButtonBox.Apply).clicked.connect(self.apply_clicked);
+        apply_button = self.buttons.button(QDialogButtonBox.Apply)
+        apply_button.clicked.connect(self.apply_clicked)
         self.buttons.accepted.connect(self.ok_clicked)
         self.buttons.rejected.connect(self.close_clicked)
 

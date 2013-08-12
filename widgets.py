@@ -63,11 +63,15 @@ class FPortName(FHBoxLayout):
                 self.port = Port(current_text, serialfc_name)
         except IOError as e:
             print(e)
-            # pySerial doesn't seem to correctly set any of it's
-            # attributes so we can't check for an already open error specifically
+            """
+            pySerial doesn't seem to correctly set any of it's
+            attributes so we can't check for an already open error
+            specifically
+            """
             msgBox = QMessageBox()
             msgBox.setWindowTitle('Problem Opening Port')
-            msgBox.setText('There was a problem opening this port. Make sure the port isn\'t already open elsewhere.')
+            msgBox.setText('There was a problem opening this port. Make sure \
+                            the port isn\'t already open elsewhere.')
             msgBox.setIcon(QMessageBox.Information)
             msgBox.exec_()
         except:
@@ -85,16 +89,19 @@ class FPortName(FHBoxLayout):
                     self.port.close()
                     self.port = None
             except:
-                # Doesn't have the _card_type option (likely using an older driver)
+                """
+                Doesn't have the _card_type option (likely using an older
+                driver)
+                """
                 msgBox = QMessageBox()
                 msgBox.setWindowTitle('Unknown Port')
-                msgBox.setText('This port is either not a Fastcom port or using an older driver.')
+                msgBox.setText('This port is either not a Fastcom port or \
+                               using an older driver.')
                 msgBox.setIcon(QMessageBox.Information)
                 msgBox.exec_()
 
                 self.port.close()
                 self.port = None
-
 
         # Will be None if port connection didn't complete
         self.port_changed.emit(self.port)
@@ -123,7 +130,7 @@ class PortChangedTracker(object):
         except AttributeError:
             # This functionality isn't supported on this port
             self.unsupported()
-        except: # Raise any random unknown exceptions for debugging
+        except:  # Raise any random unknown exceptions for debugging
             raise
         else:
             self.supported()
@@ -182,13 +189,15 @@ class FTriggerLevel(FHBoxLayout, PortChangedTracker):
 class FTxTriggerLevel(FTriggerLevel):
 
     def __init__(self, port_widget=None):
-        super(FTxTriggerLevel, self).__init__("TX Trigger Level", "tx_trigger", port_widget)
+        super(FTxTriggerLevel, self).__init__("TX Trigger Level", "tx_trigger",
+                                              port_widget)
 
 
 class FRxTriggerLevel(FTriggerLevel):
 
     def __init__(self, port_widget=None):
-        super(FRxTriggerLevel, self).__init__("RX Trigger Level", "rx_trigger", port_widget)
+        super(FRxTriggerLevel, self).__init__("RX Trigger Level", "rx_trigger",
+                                              port_widget)
 
 
 class FBooleanAttribute(QCheckBox, PortChangedTracker):
@@ -209,7 +218,8 @@ class FBooleanAttribute(QCheckBox, PortChangedTracker):
 class FTermination(FBooleanAttribute):
 
     def __init__(self, port_widget=None):
-        super(FTermination, self).__init__("Termination", "termination", port_widget)
+        super(FTermination, self).__init__("Termination", "termination",
+                                           port_widget)
 
 
 class F9Bit(FBooleanAttribute):
@@ -221,7 +231,8 @@ class F9Bit(FBooleanAttribute):
 class FEchoCancel(FBooleanAttribute):
 
     def __init__(self, port_widget=None):
-        super(FEchoCancel, self).__init__("Echo Cancel", "echo_cancel", port_widget)
+        super(FEchoCancel, self).__init__("Echo Cancel", "echo_cancel",
+                                          port_widget)
 
 
 class FClockFrequency(FHBoxLayout, PortChangedTracker):
@@ -255,7 +266,8 @@ class FClockFrequency(FHBoxLayout, PortChangedTracker):
 
         if self.line_edit.text():
             error_title = 'Invalid Clock Frequency'
-            error_text = 'Make sure to set the clock frequency to a value between {:,.0f} and {:,.0f} Hz.'.format(*value_range)
+            error_text = 'Make sure to set the clock frequency to a value \
+                          between {:,.0f} and {:,.0f} Hz.'.format(*value_range)
             frequency = None
 
             #TODO: This all might be able to be simplified to one messagebox
@@ -296,7 +308,7 @@ class FSampleRate(FHBoxLayout, PortChangedTracker):
         self.addWidget(self.combo_box)
         self.addWidget(self.spin_box)
 
-        self.card_type = CARD_TYPE_UNKNOWN #TODO: Why is this set?
+        self.card_type = CARD_TYPE_UNKNOWN  # TODO: Why is this set?
 
         # Defaults to this situation so that the GUI looks normal
         # before a port is opened
@@ -435,7 +447,7 @@ class FProtocol(FHBoxLayout, PortChangedTracker):
 
         self.addWidget(self.rs422_radio_button)
         self.addWidget(self.rs485_radio_button)
-        self.layout.addStretch();
+        self.layout.addStretch()
 
     def port_changed(self, port):
         self.rs485_radio_button.setChecked(port.rs485)
