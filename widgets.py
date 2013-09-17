@@ -299,7 +299,7 @@ class FClockFrequency(FHBoxLayout, PortChangedTracker):
                 return
 
             if frequency and (value_range[0] <= frequency <= value_range[1]):
-                port.clock_frequency = frequency
+                port.clock_rate = frequency
             else:
                 msgBox = QMessageBox()
                 msgBox.setWindowTitle(error_title)
