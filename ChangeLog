@@ -1,4 +1,4 @@
-version 1.2.1 (9/20/2013)
+version 1.2.2 (9/20/2013)
 --------------------------------------------------------------------------------
 - Changed the maximum clock frequency of the 335 cards to 180 MHz
 - Added a check for failure when setting the clock frequency
