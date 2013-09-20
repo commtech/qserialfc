@@ -87,8 +87,8 @@ class FPortName(FHBoxLayout):
             """
             msgBox = QMessageBox()
             msgBox.setWindowTitle('Problem Opening Port')
-            msgBox.setText('There was a problem opening this port. Make sure \
-                            the port isn\'t already open elsewhere.')
+            msgBox.setText('There was a problem opening this port. Make sure ' \
+                            'the port isn\'t already open elsewhere.')
             msgBox.setIcon(QMessageBox.Information)
             msgBox.exec_()
         except:
@@ -112,8 +112,8 @@ class FPortName(FHBoxLayout):
                 """
                 msgBox = QMessageBox()
                 msgBox.setWindowTitle('Unknown Port')
-                msgBox.setText('This port is either not a Fastcom port or \
-                               using an older driver.')
+                msgBox.setText('This port is either not a Fastcom port or ' \
+                               'using an older driver.')
                 msgBox.setIcon(QMessageBox.Information)
                 msgBox.exec_()
 
@@ -283,8 +283,8 @@ class FClockFrequency(FHBoxLayout, PortChangedTracker):
 
         if self.line_edit.text():
             error_title = 'Invalid Clock Frequency'
-            error_text = 'Make sure to set the clock frequency to a value \
-                          between {:,.0f} and {:,.0f} Hz.'.format(*value_range)
+            error_text = 'Make sure to set the clock frequency to a value ' \
+                          'between {:,.0f} and {:,.0f} Hz.'.format(*value_range)
             frequency = None
 
             #TODO: This all might be able to be simplified to one messagebox
