@@ -279,7 +279,7 @@ class FClockFrequency(FHBoxLayout, PortChangedTracker):
         if card_type == CARD_TYPE_FSCC:
             value_range = (200, 270000000)
         elif card_type == CARD_TYPE_PCI:
-            value_range = (6000000, 200000000)
+            value_range = (6000000, 180000000)
 
         if self.line_edit.text():
             error_title = 'Invalid Clock Frequency'
@@ -299,7 +299,14 @@ class FClockFrequency(FHBoxLayout, PortChangedTracker):
                 return
 
             if frequency and (value_range[0] <= frequency <= value_range[1]):
-                port.clock_rate = frequency
+                try:
+                    port.clock_rate = frequency
+                except:
+                    msgBox = QMessageBox()
+                    msgBox.setWindowTitle('Problem Setting Clock Rate')
+                    msgBox.setText('There was a problem setting the clock rate.')
+                    msgBox.setIcon(QMessageBox.Information)
+                    msgBox.exec_()
             else:
                 msgBox = QMessageBox()
                 msgBox.setWindowTitle(error_title)
