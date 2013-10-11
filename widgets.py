@@ -510,3 +510,70 @@ class FFrameLength(FHBoxLayout, PortChangedTracker):
 
     def apply_changes(self, port):
         port.frame_length = self.spin_box.value()
+
+
+class FFixedBaudRate(FHBoxLayout, PortChangedTracker):
+
+    def __init__(self, port_widget=None):
+        FHBoxLayout.__init__(self)
+        PortChangedTracker.__init__(self, port_widget)
+
+        self.check_box = QCheckBox("Fixed Baud Rate")
+        self.line_edit = QLineEdit()
+        self.line_edit.setEnabled(False)
+
+        self.check_box.setCheckState(Qt.CheckState.Unchecked)
+        self.check_box.stateChanged.connect(self.check_box_state_changed)
+
+        self.addWidget(self.check_box)
+        self.addWidget(self.line_edit)
+
+    def check_box_state_changed(self):
+        if self.check_box.checkState() == Qt.CheckState.Unchecked:
+            self.line_edit.setEnabled(False)
+        else:
+            self.line_edit.setEnabled(True)
+
+    def port_changed(self, port):
+        rate = port.get_fixed_baud_rate()
+        self.check_box.setChecked(rate != -1)
+        self.line_edit.setText(str(rate))
+
+    def apply_changes(self, port):
+        if self.check_box.isChecked():
+            error_title = 'Invalid Baud Rate'
+            error_text = 'Make sure to set a valid baud rate.'
+
+            if self.line_edit.text():
+                rate = None
+
+                #TODO: This all might be able to be simplified to one messagebox
+                try:
+                    rate = int(self.line_edit.text())
+                except:
+                    msgBox = QMessageBox()
+                    msgBox.setWindowTitle(error_title)
+                    msgBox.setText(error_text)
+                    msgBox.setIcon(QMessageBox.Warning)
+                    msgBox.exec_()
+                    return
+
+                if rate <= 0:
+                    msgBox = QMessageBox()
+                    msgBox.setWindowTitle(error_title)
+                    msgBox.setText(error_text)
+                    msgBox.setIcon(QMessageBox.Warning)
+                    msgBox.exec_()
+                    return
+
+                port.enable_fixed_baud_rate(rate)
+
+            else:
+                msgBox = QMessageBox()
+                msgBox.setWindowTitle(error_title)
+                msgBox.setText(error_text)
+                msgBox.setIcon(QMessageBox.Warning)
+                msgBox.exec_()
+                return
+        else:
+            port.disable_fixed_baud_rate()

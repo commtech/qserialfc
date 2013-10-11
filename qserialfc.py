@@ -27,6 +27,7 @@ class PortForm(QDialog):
         self.external_transmit = FExternalTransmit(self.port_name)
         self.frame_length = FFrameLength(self.port_name)
         self.protocol = FProtocol(self.port_name)
+        self.fixed_baud_rate = FFixedBaudRate(self.port_name)
         self.buttons = QDialogButtonBox(QDialogButtonBox.Apply |
                                         QDialogButtonBox.Ok |
                                         QDialogButtonBox.Close)
@@ -42,6 +43,7 @@ class PortForm(QDialog):
         self.external_transmit.setEnabled(False)
         self.frame_length.setEnabled(False)
         self.protocol.setEnabled(False)
+        self.fixed_baud_rate.setEnabled(False)
         self.buttons = QDialogButtonBox(QDialogButtonBox.Apply |
                                         QDialogButtonBox.Ok |
                                         QDialogButtonBox.Close)
@@ -61,6 +63,7 @@ class PortForm(QDialog):
         layout.addWidget(self.external_transmit)
         layout.addWidget(self.frame_length)
         layout.addWidget(self.protocol)
+        layout.addWidget(self.fixed_baud_rate)
         layout.addWidget(self.buttons)
 
         # Set dialog layout
