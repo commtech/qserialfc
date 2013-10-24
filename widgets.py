@@ -387,7 +387,7 @@ class FIsochronous(FHBoxLayout, PortChangedTracker):
         self.spin_box = QSpinBox()
 
         self.spin_box.setMinimum(0)
-        self.spin_box.setMaximum(8)
+        self.spin_box.setMaximum(10)
         self.spin_box.setPrefix('Mode ')
         self.spin_box.setEnabled(False)
         self.check_box.setCheckState(Qt.CheckState.Unchecked)
