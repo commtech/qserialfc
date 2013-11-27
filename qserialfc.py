@@ -44,9 +44,6 @@ class PortForm(QDialog):
         self.frame_length.setEnabled(False)
         self.protocol.setEnabled(False)
         self.fixed_baud_rate.setEnabled(False)
-        self.buttons = QDialogButtonBox(QDialogButtonBox.Apply |
-                                        QDialogButtonBox.Ok |
-                                        QDialogButtonBox.Close)
 
         # Create layout and add widgets
         layout = QVBoxLayout()
