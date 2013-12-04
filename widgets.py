@@ -262,6 +262,7 @@ class FClockFrequency(FHBoxLayout, PortChangedTracker):
         self.line_edit = QLineEdit()
 
         self.addWidget(self.label)
+        self.layout.addStretch()
         self.addWidget(self.line_edit)
 
     def port_changed(self, port):
@@ -526,6 +527,7 @@ class FFixedBaudRate(FHBoxLayout, PortChangedTracker):
         self.check_box.stateChanged.connect(self.check_box_state_changed)
 
         self.addWidget(self.check_box)
+        self.layout.addStretch()
         self.addWidget(self.line_edit)
 
     def check_box_state_changed(self):
