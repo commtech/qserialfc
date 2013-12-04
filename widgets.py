@@ -23,7 +23,7 @@ class FHBoxLayout(QWidget):
 
 
 def is_serialfc_port(filename):
-        if filename.find("serialfc") != -1:
+        if filename.find('serialfc') != -1:
             return True
         else:
             return False
@@ -38,13 +38,13 @@ class FPortName(FHBoxLayout):
 
         self.port = None
 
-        self.label = QLabel("Port")
+        self.label = QLabel('Port')
         self.combo_box = QComboBox()
 
         if os.name == 'nt':
             port_names = sorted([port[0] for port in list_ports.comports()])
         else:
-            dev_nodes = os.listdir("/dev/")
+            dev_nodes = os.listdir('/dev/')
             port_names = sorted(list(filter(is_serialfc_port, dev_nodes)))
 
         self.combo_box.addItems(port_names)
@@ -74,7 +74,7 @@ class FPortName(FHBoxLayout):
             if os.name == 'nt':
                 self.port = Port(current_text)
             else:
-                serialfc_num = re.sub("[^0-9]", "", current_text)
+                serialfc_num = re.sub('[^0-9]', '', current_text)
                 ttyS_num = int(serialfc_num) + 4
                 ttyS_name = '/dev/ttyS{}'.format(ttyS_num)
 
@@ -206,14 +206,14 @@ class FTriggerLevel(FHBoxLayout, PortChangedTracker):
 class FTxTriggerLevel(FTriggerLevel):
 
     def __init__(self, port_widget=None):
-        super(FTxTriggerLevel, self).__init__("TX Trigger Level", "tx_trigger",
+        super(FTxTriggerLevel, self).__init__('TX Trigger Level', 'tx_trigger',
                                               port_widget)
 
 
 class FRxTriggerLevel(FTriggerLevel):
 
     def __init__(self, port_widget=None):
-        super(FRxTriggerLevel, self).__init__("RX Trigger Level", "rx_trigger",
+        super(FRxTriggerLevel, self).__init__('RX Trigger Level', 'rx_trigger',
                                               port_widget)
 
 
@@ -235,20 +235,20 @@ class FBooleanAttribute(QCheckBox, PortChangedTracker):
 class FTermination(FBooleanAttribute):
 
     def __init__(self, port_widget=None):
-        super(FTermination, self).__init__("Termination", "termination",
+        super(FTermination, self).__init__('Termination', 'termination',
                                            port_widget)
 
 
 class F9Bit(FBooleanAttribute):
 
     def __init__(self, port_widget=None):
-        super(F9Bit, self).__init__("9-Bit", "nine_bit", port_widget)
+        super(F9Bit, self).__init__('9-Bit', 'nine_bit', port_widget)
 
 
 class FEchoCancel(FBooleanAttribute):
 
     def __init__(self, port_widget=None):
-        super(FEchoCancel, self).__init__("Echo Cancel", "echo_cancel",
+        super(FEchoCancel, self).__init__('Echo Cancel', 'echo_cancel',
                                           port_widget)
 
 
@@ -258,7 +258,7 @@ class FClockFrequency(FHBoxLayout, PortChangedTracker):
         FHBoxLayout.__init__(self)
         PortChangedTracker.__init__(self, port_widget)
 
-        self.label = QLabel("Clock Frequency")
+        self.label = QLabel('Clock Frequency')
         self.line_edit = QLineEdit()
 
         self.addWidget(self.label)
@@ -321,7 +321,7 @@ class FSampleRate(FHBoxLayout, PortChangedTracker):
         FHBoxLayout.__init__(self)
         PortChangedTracker.__init__(self, port_widget)
 
-        self.label = QLabel("Sample Rate")
+        self.label = QLabel('Sample Rate')
         self.combo_box = QComboBox()
         self.spin_box = QSpinBox()
 
@@ -383,7 +383,7 @@ class FIsochronous(FHBoxLayout, PortChangedTracker):
         FHBoxLayout.__init__(self)
         PortChangedTracker.__init__(self, port_widget)
 
-        self.check_box = QCheckBox("Isochronous")
+        self.check_box = QCheckBox('Isochronous')
         self.spin_box = QSpinBox()
 
         self.spin_box.setMinimum(0)
@@ -421,7 +421,7 @@ class FExternalTransmit(FHBoxLayout, PortChangedTracker):
         FHBoxLayout.__init__(self)
         PortChangedTracker.__init__(self, port_widget)
 
-        self.check_box = QCheckBox("External Transmit")
+        self.check_box = QCheckBox('External Transmit')
         self.spin_box = QSpinBox()
 
         self.spin_box.setMinimum(1)
@@ -466,8 +466,8 @@ class FProtocol(FHBoxLayout, PortChangedTracker):
         FHBoxLayout.__init__(self)
         PortChangedTracker.__init__(self, port_widget)
 
-        self.rs422_radio_button = QRadioButton("RS422")
-        self.rs485_radio_button = QRadioButton("RS485")
+        self.rs422_radio_button = QRadioButton('RS422')
+        self.rs485_radio_button = QRadioButton('RS485')
 
         self.addWidget(self.rs422_radio_button)
         self.addWidget(self.rs485_radio_button)
@@ -487,7 +487,7 @@ class FFrameLength(FHBoxLayout, PortChangedTracker):
         FHBoxLayout.__init__(self)
         PortChangedTracker.__init__(self, port_widget)
 
-        self.label = QLabel("Frame Length")
+        self.label = QLabel('Frame Length')
         self.spin_box = QSpinBox()
 
         self.spin_box.setMinimum(1)
@@ -518,7 +518,7 @@ class FFixedBaudRate(FHBoxLayout, PortChangedTracker):
         FHBoxLayout.__init__(self)
         PortChangedTracker.__init__(self, port_widget)
 
-        self.check_box = QCheckBox("Fixed Baud Rate")
+        self.check_box = QCheckBox('Fixed Baud Rate')
         self.line_edit = QLineEdit()
         self.line_edit.setEnabled(False)
 
