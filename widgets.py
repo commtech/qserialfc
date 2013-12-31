@@ -70,15 +70,9 @@ class FPortName(FHBoxLayout):
             self.port = None
 
         try:
-            current_text = self.combo_box.currentText()
-            if os.name == 'nt':
-                self.port = Port(current_text)
-            else:
-                serialfc_num = re.sub('[^0-9]', '', current_text)
-                ttyS_num = int(serialfc_num) + 4
-                ttyS_name = '/dev/ttyS{}'.format(ttyS_num)
+            port_num = int(re.search('(\d+)$', self.combo_box.currentText()).group(0))
 
-                self.port = Port(ttyS_name, '/dev/{}'.format(current_text))
+            self.port = Port(port_num)
         except IOError:
             """
             pySerial doesn't seem to correctly set any of it's
