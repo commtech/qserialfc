@@ -82,7 +82,8 @@ class FPortName(FHBoxLayout):
             msgBox = QMessageBox()
             msgBox.setWindowTitle('Problem Opening Port')
             msgBox.setText('There was a problem opening this port. Make sure ' \
-                            'the port isn\'t already open elsewhere.')
+                            'the port isn\'t already open elsewhere and you ' \
+                            'have sufficient permissions.')
             msgBox.setIcon(QMessageBox.Information)
             msgBox.exec_()
         except:
