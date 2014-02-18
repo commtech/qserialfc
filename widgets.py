@@ -26,10 +26,10 @@ from PySide.QtGui import *
 
 from dialogs import *
 
-from serial.tools import list_ports
-
 import serialfc
 import serial
+
+from serialfc.tools import list_ports
 
 
 class FBoxLayout(QWidget):
