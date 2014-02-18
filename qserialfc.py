@@ -1,12 +1,30 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
+"""
+    Copyright (C) 2014 Commtech, Inc.
+
+    This file is part of qserialfc.
+
+    qserialfc is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    qserialfc is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with qserialfc.  If not, see <http://www.gnu.org/licenses/>.
+
+"""
 
 import sys
 
 from PySide.QtCore import Signal
-from PySide.QtGui import QApplication, QDialog, QDialogButtonBox, QVBoxLayout
+from PySide.QtGui import *
 
 from widgets import *
+from dialogs import *
 
 
 class PortForm(QDialog):
@@ -16,60 +34,45 @@ class PortForm(QDialog):
         super(PortForm, self).__init__()
 
         self.port_name = FPortName(self.apply_changes)
-        self.sample_rate = FSampleRate(self.port_name)
-        self.clock_frequency = FClockFrequency(self.port_name)
-        self.tx_trigger_lvl = FTxTriggerLevel(self.port_name)
-        self.rx_trigger_lvl = FRxTriggerLevel(self.port_name)
-        self.termination = FTermination(self.port_name)
-        self.echo_cancel = FEchoCancel(self.port_name)
-        self.nine_bit = F9Bit(self.port_name)
-        self.isochronous = FIsochronous(self.port_name)
-        self.external_transmit = FExternalTransmit(self.port_name)
-        self.frame_length = FFrameLength(self.port_name)
-        self.protocol = FProtocol(self.port_name)
-        self.fixed_baud_rate = FFixedBaudRate(self.port_name)
-        self.buttons = QDialogButtonBox(QDialogButtonBox.Apply |
-                                        QDialogButtonBox.Ok |
-                                        QDialogButtonBox.Close)
 
-        self.sample_rate.setEnabled(False)
-        self.clock_frequency.setEnabled(False)
-        self.tx_trigger_lvl.setEnabled(False)
-        self.rx_trigger_lvl.setEnabled(False)
-        self.termination.setEnabled(False)
-        self.nine_bit.setEnabled(False)
-        self.echo_cancel.setEnabled(False)
-        self.isochronous.setEnabled(False)
-        self.external_transmit.setEnabled(False)
-        self.frame_length.setEnabled(False)
-        self.protocol.setEnabled(False)
-        self.fixed_baud_rate.setEnabled(False)
+        sample_rate = FSampleRate(self.port_name)
+        clock_frequency = FClockFrequency(self.port_name)
+        tx_trigger_lvl = FTxTriggerLevel(self.port_name)
+        rx_trigger_lvl = FRxTriggerLevel(self.port_name)
+        termination = FTermination(self.port_name)
+        echo_cancel = FEchoCancel(self.port_name)
+        nine_bit = F9Bit(self.port_name)
+        isochronous = FIsochronous(self.port_name)
+        external_transmit = FExternalTransmit(self.port_name)
+        frame_length = FFrameLength(self.port_name)
+        protocol = FProtocol(self.port_name)
+        fixed_baud_rate = FFixedBaudRate(self.port_name)
+
+        buttons = FDialogButtonBox(self.port_name)
+        buttons.apply.connect(self.apply_clicked)
+        buttons.accepted.connect(self.ok_clicked)
+        buttons.rejected.connect(self.close_clicked)
 
         # Create layout and add widgets
         layout = QVBoxLayout()
 
         layout.addWidget(self.port_name)
-        layout.addWidget(self.sample_rate)
-        layout.addWidget(self.clock_frequency)
-        layout.addWidget(self.tx_trigger_lvl)
-        layout.addWidget(self.rx_trigger_lvl)
-        layout.addWidget(self.termination)
-        layout.addWidget(self.nine_bit)
-        layout.addWidget(self.echo_cancel)
-        layout.addWidget(self.isochronous)
-        layout.addWidget(self.external_transmit)
-        layout.addWidget(self.frame_length)
-        layout.addWidget(self.protocol)
-        layout.addWidget(self.fixed_baud_rate)
-        layout.addWidget(self.buttons)
+        layout.addWidget(sample_rate)
+        layout.addWidget(clock_frequency)
+        layout.addWidget(tx_trigger_lvl)
+        layout.addWidget(rx_trigger_lvl)
+        layout.addWidget(termination)
+        layout.addWidget(nine_bit)
+        layout.addWidget(echo_cancel)
+        layout.addWidget(isochronous)
+        layout.addWidget(external_transmit)
+        layout.addWidget(frame_length)
+        layout.addWidget(protocol)
+        layout.addWidget(fixed_baud_rate)
+        layout.addWidget(buttons)
 
         # Set dialog layout
         self.setLayout(layout)
-
-        apply_button = self.buttons.button(QDialogButtonBox.Apply)
-        apply_button.clicked.connect(self.apply_clicked)
-        self.buttons.accepted.connect(self.ok_clicked)
-        self.buttons.rejected.connect(self.close_clicked)
 
         self.setFixedSize(self.sizeHint())
         self.setWindowTitle('Fastcom Serial Settings')

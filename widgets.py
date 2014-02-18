@@ -1,37 +1,79 @@
+"""
+    Copyright (C) 2014 Commtech, Inc.
+
+    This file is part of qserialfc.
+
+    qserialfc is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    qserialfc is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with qserialfc.  If not, see <http://www.gnu.org/licenses/>.
+
+"""
+
 import os
 import re
 
 from PySide.QtCore import Signal, Qt
 from PySide.QtGui import *
 
+from dialogs import *
+
 from serial.tools import list_ports
 
-from serialfc import *
+import serialfc
+import serial
 
 
-class FHBoxLayout(QWidget):
+class FBoxLayout(QWidget):
 
-    def __init__(self, *args, **kwargs):
-        super(FHBoxLayout, self).__init__(*args, **kwargs)
+    def __init__(self, layout_type, *args, **kwargs):
+        super(FBoxLayout, self).__init__(*args, **kwargs)
 
-        self.layout = QHBoxLayout()
+        self.layout = layout_type()
         self.layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(self.layout)
 
     def addWidget(self, widget):
         self.layout.addWidget(widget)
 
+    def addLayout(self, widget):
+        self.layout.addLayout(widget)
 
+    def addStretch(self):
+        self.layout.addStretch()
+
+
+class FHBoxLayout(FBoxLayout):
+
+    def __init__(self, *args, **kwargs):
+        super(FHBoxLayout, self).__init__(QHBoxLayout, *args, **kwargs)
+
+
+class FVBoxLayout(FBoxLayout):
+
+    def __init__(self, *args, **kwargs):
+        super(FVBoxLayout, self).__init__(QVBoxLayout, *args, **kwargs)
+
+
+#TODO: Switch to list_ports and remove this
 def is_serialfc_port(filename):
-        if filename.find('serialfc') != -1:
-            return True
-        else:
-            return False
+    if filename.find('serialfc') != -1:
+        return True
+    else:
+        return False
 
 
 class FPortName(FHBoxLayout):
-    port_changed = Signal(Port)
-    apply_changes = Signal(Port)
+    port_changed = Signal(serialfc.Port)
+    apply_changes = Signal(serialfc.Port)
 
     def __init__(self, apply_changes_signal):
         super(FPortName, self).__init__()
@@ -39,19 +81,18 @@ class FPortName(FHBoxLayout):
         self.port = None
 
         self.label = QLabel('Port')
-        self.combo_box = QComboBox()
 
+        #TODO: Cleanup if possible
         if os.name == 'nt':
             port_names = sorted([port[0] for port in list_ports.comports()])
         else:
             dev_nodes = os.listdir('/dev/')
             port_names = sorted(list(filter(is_serialfc_port, dev_nodes)))
 
+        self.combo_box = QComboBox()
         self.combo_box.addItems(port_names)
-        self.combo_box.setCurrentIndex(-1)
-
-        # Connect this after the combo box is already set to a -1 index
         self.combo_box.currentIndexChanged.connect(self.currentIndexChanged)
+        self.combo_box.setCurrentIndex(-1)
 
         apply_changes_signal.connect(self.apply_changes_clicked)
 
@@ -69,51 +110,35 @@ class FPortName(FHBoxLayout):
             self.port.close()
             self.port = None
 
-        try:
-            port_num = int(re.search('(\d+)$', self.combo_box.currentText()).group(0))
+        port_name = self.combo_box.currentText()
 
-            self.port = Port(port_num)
-        except IOError:
-            """
-            pySerial doesn't seem to correctly set any of it's
-            attributes so we can't check for an already open error
-            specifically
-            """
-            msgBox = QMessageBox()
-            msgBox.setWindowTitle('Problem Opening Port')
-            msgBox.setText('There was a problem opening this port. Make sure ' \
-                            'the port isn\'t already open elsewhere and you ' \
-                            'have sufficient permissions.')
-            msgBox.setIcon(QMessageBox.Information)
-            msgBox.exec_()
-        except:
-            raise
-        else:
+        if port_name:
+            port_num = int(re.search('(\d+)$', port_name).group(0))
+
+            try:
+                self.port = serialfc.Port(port_num)
+            except serialfc.PortNotFoundError:
+                FPortNotFound().exec_()
+            except serialfc.InvalidAccessError:
+                FInvalidAccess().exec_()
+            except serial.serialutil.SerialException:
+                FUnknownError().exec_()
+
+        if self.port:
             # The port was successfulyl opened at this point
             try:
-                if self.port._card_type == CARD_TYPE_UNKNOWN:
-                    msgBox = QMessageBox()
-                    msgBox.setWindowTitle('Unknown Port')
-                    msgBox.setText('This port isn\'t a Fastcom port.')
-                    msgBox.setIcon(QMessageBox.Information)
-                    msgBox.exec_()
-
-                    self.port.close()
-                    self.port = None
+                card_type = self.port._card_type
             except:
-                """
-                Doesn't have the _card_type option (likely using an older
-                driver)
-                """
-                msgBox = QMessageBox()
-                msgBox.setWindowTitle('Unknown Port')
-                msgBox.setText('This port is either not a Fastcom port or ' \
-                               'using an older driver.')
-                msgBox.setIcon(QMessageBox.Information)
-                msgBox.exec_()
+                FUnknownPort().exec_()
 
                 self.port.close()
                 self.port = None
+            else:
+                if card_type == serialfc.CARD_TYPE_UNKNOWN:
+                    FUnknownPort().exec_()
+
+                    self.port.close()
+                    self.port = None
 
         # Will be None if port connection didn't complete
         self.port_changed.emit(self.port)
@@ -129,6 +154,8 @@ class PortChangedTracker(object):
 
         port_widget.port_changed.connect(self._port_changed)
         port_widget.apply_changes.connect(self._apply_changes)
+
+        self.setEnabled(False)
 
     def _port_changed(self, port):
         # There isn't a port opened so we disable the widget
@@ -147,12 +174,12 @@ class PortChangedTracker(object):
         else:
             self.supported()
 
-    def port_changed(self, port):
-        raise NotImplementedError
-
     def _apply_changes(self, port):
         if self.isEnabled():
             self.apply_changes(port)
+
+    def port_changed(self, port):
+        raise NotImplementedError
 
     def apply_changes(self, port):
         raise NotImplementedError
@@ -173,20 +200,20 @@ class FTriggerLevel(FHBoxLayout, PortChangedTracker):
 
         self.attribute = attribute
 
-        self.label = QLabel(label)
+        label = QLabel(label)
         self.spin_box = QSpinBox()
 
-        self.addWidget(self.label)
+        self.addWidget(label)
         self.addWidget(self.spin_box)
 
     def port_changed(self, port):
         card_type = port._card_type
 
-        if card_type == CARD_TYPE_FSCC:
+        if card_type == serialfc.CARD_TYPE_FSCC:
             value_range = (0, 127)
-        elif card_type == CARD_TYPE_PCI:
+        elif card_type == serialfc.CARD_TYPE_PCI:
             value_range = (0, 64)
-        elif card_type == CARD_TYPE_PCIe:
+        elif card_type == serialfc.CARD_TYPE_PCIe:
             value_range = (0, 255)
 
         self.spin_box.setMinimum(value_range[0])
@@ -253,18 +280,18 @@ class FClockFrequency(FHBoxLayout, PortChangedTracker):
         FHBoxLayout.__init__(self)
         PortChangedTracker.__init__(self, port_widget)
 
-        self.label = QLabel('Clock Frequency')
+        label = QLabel('Clock Frequency')
         self.line_edit = QLineEdit()
 
-        self.addWidget(self.label)
-        self.layout.addStretch()
+        self.addWidget(label)
+        self.addStretch()
         self.addWidget(self.line_edit)
 
     def port_changed(self, port):
         card_type = port._card_type
 
         # This disabled the widget for the PCIe card
-        if card_type == CARD_TYPE_PCIe:
+        if card_type == serialfc.CARD_TYPE_PCIe:
             raise AttributeError()
 
         self.line_edit.setText('')
@@ -272,43 +299,18 @@ class FClockFrequency(FHBoxLayout, PortChangedTracker):
     def apply_changes(self, port):
         card_type = port._card_type
 
-        if card_type == CARD_TYPE_FSCC:
-            value_range = (200, 270000000)
-        elif card_type == CARD_TYPE_PCI:
+        if card_type == serialfc.CARD_TYPE_FSCC:
+            value_range = (15000, 270000000)
+        elif card_type == serialfc.CARD_TYPE_PCI:
             value_range = (6000000, 180000000)
 
         if self.line_edit.text():
-            error_title = 'Invalid Clock Frequency'
-            error_text = 'Make sure to set the clock frequency to a value ' \
-                          'between {:,.0f} and {:,.0f} Hz.'.format(*value_range)
-            frequency = None
-
-            #TODO: This all might be able to be simplified to one messagebox
             try:
-                frequency = int(self.line_edit.text())
-            except:
-                msgBox = QMessageBox()
-                msgBox.setWindowTitle(error_title)
-                msgBox.setText(error_text)
-                msgBox.setIcon(QMessageBox.Warning)
-                msgBox.exec_()
-                return
-
-            if frequency and (value_range[0] <= frequency <= value_range[1]):
-                try:
-                    port.clock_rate = frequency
-                except:
-                    msgBox = QMessageBox()
-                    msgBox.setWindowTitle('Problem Setting Clock Rate')
-                    msgBox.setText('There was a problem setting the clock rate.')
-                    msgBox.setIcon(QMessageBox.Information)
-                    msgBox.exec_()
-            else:
-                msgBox = QMessageBox()
-                msgBox.setWindowTitle(error_title)
-                msgBox.setText(error_text)
-                msgBox.setIcon(QMessageBox.Warning)
-                msgBox.exec_()
+                port.clock_rate = int(self.line_edit.text())
+            except serialfc.InvalidParameterError:
+                FInvalidClockFrequency(value_range).exec_()
+            except ValueError:
+                FInvalidClockFrequency(value_range).exec_()
 
 
 class FSampleRate(FHBoxLayout, PortChangedTracker):
@@ -317,18 +319,18 @@ class FSampleRate(FHBoxLayout, PortChangedTracker):
         FHBoxLayout.__init__(self)
         PortChangedTracker.__init__(self, port_widget)
 
-        self.label = QLabel('Sample Rate')
+        label = QLabel('Sample Rate')
         self.combo_box = QComboBox()
         self.spin_box = QSpinBox()
 
         self.spin_box.setMinimum(4)
         self.spin_box.setMaximum(16)
 
-        self.addWidget(self.label)
+        self.addWidget(label)
         self.addWidget(self.combo_box)
         self.addWidget(self.spin_box)
 
-        self.card_type = CARD_TYPE_UNKNOWN  # TODO: Why is this set?
+        self.card_type = serialfc.CARD_TYPE_UNKNOWN  # TODO: Why is this set?
 
         # Defaults to this situation so that the GUI looks normal
         # before a port is opened
@@ -337,17 +339,17 @@ class FSampleRate(FHBoxLayout, PortChangedTracker):
     def port_changed(self, port):
         self.card_type = port._card_type
 
-        if self.card_type == CARD_TYPE_FSCC:
+        if self.card_type == serialfc.CARD_TYPE_FSCC:
             self.combo_box.hide()
             self.spin_box.show()
-        elif self.card_type == CARD_TYPE_PCI:
+        elif self.card_type == serialfc.CARD_TYPE_PCI:
             self.combo_box.show()
             self.spin_box.hide()
             self.combo_box.clear()
             rates = [8, 16]
             rates.sort(reverse=True)
             self.combo_box.addItems(list(map(str, rates)))
-        elif self.card_type == CARD_TYPE_PCIe:
+        elif self.card_type == serialfc.CARD_TYPE_PCIe:
             self.combo_box.show()
             self.spin_box.hide()
             self.combo_box.clear()
@@ -360,11 +362,11 @@ class FSampleRate(FHBoxLayout, PortChangedTracker):
         self.spin_box.setValue(rate)
 
     def apply_changes(self, port):
-        if self.card_type == CARD_TYPE_FSCC:
+        if self.card_type == serialfc.CARD_TYPE_FSCC:
             rate = self.spin_box.value()
-        elif self.card_type == CARD_TYPE_PCI:
+        elif self.card_type == serialfc.CARD_TYPE_PCI:
             rate = int(self.combo_box.currentText())
-        elif self.card_type == CARD_TYPE_PCIe:
+        elif self.card_type == serialfc.CARD_TYPE_PCIe:
             rate = int(self.combo_box.currentText())
         else:
             rate = None
@@ -386,8 +388,8 @@ class FIsochronous(FHBoxLayout, PortChangedTracker):
         self.spin_box.setMaximum(10)
         self.spin_box.setPrefix('Mode ')
         self.spin_box.setEnabled(False)
-        self.check_box.setCheckState(Qt.CheckState.Unchecked)
 
+        self.check_box.setCheckState(Qt.CheckState.Unchecked)
         self.check_box.stateChanged.connect(self.check_box_state_changed)
 
         self.addWidget(self.check_box)
@@ -424,9 +426,9 @@ class FExternalTransmit(FHBoxLayout, PortChangedTracker):
         self.spin_box.setMaximum(8190)
         self.spin_box.setSuffix(' frame')
         self.spin_box.setEnabled(False)
-        self.check_box.setCheckState(Qt.CheckState.Unchecked)
-
         self.spin_box.valueChanged.connect(self.spin_box_value_changed)
+        
+        self.check_box.setCheckState(Qt.CheckState.Unchecked)
         self.check_box.stateChanged.connect(self.check_box_state_changed)
 
         self.addWidget(self.check_box)
@@ -467,7 +469,7 @@ class FProtocol(FHBoxLayout, PortChangedTracker):
 
         self.addWidget(self.rs422_radio_button)
         self.addWidget(self.rs485_radio_button)
-        self.layout.addStretch()
+        self.addStretch()
 
     def port_changed(self, port):
         self.rs485_radio_button.setChecked(port.rs485)
@@ -483,7 +485,7 @@ class FFrameLength(FHBoxLayout, PortChangedTracker):
         FHBoxLayout.__init__(self)
         PortChangedTracker.__init__(self, port_widget)
 
-        self.label = QLabel('Frame Length')
+        label = QLabel('Frame Length')
         self.spin_box = QSpinBox()
 
         self.spin_box.setMinimum(1)
@@ -492,7 +494,7 @@ class FFrameLength(FHBoxLayout, PortChangedTracker):
 
         self.spin_box.valueChanged.connect(self.spin_box_value_changed)
 
-        self.addWidget(self.label)
+        self.addWidget(label)
         self.addWidget(self.spin_box)
 
     def spin_box_value_changed(self, i):
@@ -516,13 +518,14 @@ class FFixedBaudRate(FHBoxLayout, PortChangedTracker):
 
         self.check_box = QCheckBox('Fixed Baud Rate')
         self.line_edit = QLineEdit()
+
         self.line_edit.setEnabled(False)
 
         self.check_box.setCheckState(Qt.CheckState.Unchecked)
         self.check_box.stateChanged.connect(self.check_box_state_changed)
 
         self.addWidget(self.check_box)
-        self.layout.addStretch()
+        self.addStretch()
         self.addWidget(self.line_edit)
 
     def check_box_state_changed(self):
@@ -541,36 +544,58 @@ class FFixedBaudRate(FHBoxLayout, PortChangedTracker):
             error_title = 'Invalid Baud Rate'
             error_text = 'Make sure to set a valid baud rate.'
 
+            #TODO: Mayve more simplication
             if self.line_edit.text():
-                rate = None
-
-                #TODO: This all might be able to be simplified to one messagebox
                 try:
                     rate = int(self.line_edit.text())
                 except:
-                    msgBox = QMessageBox()
-                    msgBox.setWindowTitle(error_title)
-                    msgBox.setText(error_text)
-                    msgBox.setIcon(QMessageBox.Warning)
-                    msgBox.exec_()
+                    FInvalidFixedBaudRate().exec_()
                     return
 
                 if rate <= 0:
-                    msgBox = QMessageBox()
-                    msgBox.setWindowTitle(error_title)
-                    msgBox.setText(error_text)
-                    msgBox.setIcon(QMessageBox.Warning)
-                    msgBox.exec_()
+                    FInvalidFixedBaudRate().exec_()
                     return
 
                 port.enable_fixed_baud_rate(rate)
 
             else:
-                msgBox = QMessageBox()
-                msgBox.setWindowTitle(error_title)
-                msgBox.setText(error_text)
-                msgBox.setIcon(QMessageBox.Warning)
-                msgBox.exec_()
+                FInvalidFixedBaudRate().exec_()
                 return
         else:
             port.disable_fixed_baud_rate()
+
+
+class FDialogButtonBox(QDialogButtonBox, PortChangedTracker):
+    apply = Signal()
+
+    def __init__(self, port_widget):
+        QDialogButtonBox.__init__(
+            self,
+            QDialogButtonBox.Apply |
+            QDialogButtonBox.Ok |
+            QDialogButtonBox.Close)
+
+        PortChangedTracker.__init__(self, port_widget)
+
+        self.apply_button = self.button(QDialogButtonBox.Apply)
+        self.apply_button.clicked.connect(self.apply_clicked)
+        self.apply_button.setEnabled(False)
+
+        self.ok_button = self.button(QDialogButtonBox.Ok)
+        self.ok_button.setEnabled(False)
+
+        self.close_button = self.button(QDialogButtonBox.Close)
+        self.close_button.setEnabled(True)
+
+        self.setEnabled(True)
+
+    def apply_clicked(self):
+        self.apply.emit()
+
+    def _port_changed(self, port):
+        self.apply_button.setEnabled(bool(port))
+        self.ok_button.setEnabled(bool(port))
+        self.close_button.setEnabled(True)
+
+    def apply_changes(self, port):
+        pass
