@@ -2,10 +2,15 @@
 This README file is best viewed [online](http://github.com/commtech/qserialfc/).
 
 
-## Dependencies
+## Build Dependencies
 - [Python 3](http://www.python.org/download/) (32-bit)
 - [PySide](http://qt-project.org/wiki/PySide)
 - [pyserialfc](http://github.com/commtech/pyserialfc/)
+
+
+## Run-time Dependencies
+- OS: Windows XP+ & Linux
+- Visual C++ 2010 Redistributable (Windows only)
 
 
 ## API Compatibility
