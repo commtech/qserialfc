@@ -6,6 +6,7 @@ This README file is best viewed [online](http://github.com/commtech/qserialfc/).
 - [Python 3](http://www.python.org/download/) (32-bit)
 - [PySide](http://qt-project.org/wiki/PySide)
 - [pyserialfc](http://github.com/commtech/pyserialfc/)
+- [cx_Freeze](http://cx-freeze.sourceforge.net/)
 
 
 ## Run-time Dependencies
