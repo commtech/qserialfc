@@ -4,7 +4,8 @@ from cx_Freeze import setup, Executable
 
 # Dependencies are automatically detected, but it might need
 # fine tuning.
-buildOptions = dict(packages=['serialfc'], excludes=[], includes=['re'])
+buildOptions = dict(packages=['serialfc'], excludes=[], includes=['re'],
+                    include_msvcr=True)
 
 
 # GUI applications require a different base on Windows (the default is for a
