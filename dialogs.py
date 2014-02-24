@@ -73,6 +73,6 @@ class FInvalidFixedBaudRate(QMessageBox):
         super(FInvalidFixedBaudRate, self).__init__(*args, **kwargs)
 
         self.setWindowTitle('Invalid Fixed Baud Rate')
-        self.setText('The fixed baud rate was not set. Make sure to set a
+        self.setText('The fixed baud rate was not set. Make sure to set a '
                      'valid fixed baud rate value.')
         self.setIcon(QMessageBox.Warning)
