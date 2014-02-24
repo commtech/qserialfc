@@ -541,9 +541,6 @@ class FFixedBaudRate(FHBoxLayout, PortChangedTracker):
 
     def apply_changes(self, port):
         if self.check_box.isChecked():
-            error_title = 'Invalid Baud Rate'
-            error_text = 'Make sure to set a valid baud rate.'
-
             #TODO: Mayve more simplication
             if self.line_edit.text():
                 try:
