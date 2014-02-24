@@ -38,7 +38,7 @@ class FUnknownPort(QMessageBox):
         super(FUnknownPort, self).__init__(*args, **kwargs)
 
         self.setWindowTitle('Unknown Port')
-        self.setText('This port is either not a Fastcom port or ' \
+        self.setText('This port is either not a Fastcom port or '
                      'using an older driver.')
         self.setIcon(QMessageBox.Information)
 
@@ -49,9 +49,9 @@ class FUnknownError(QMessageBox):
         super(FUnknownError, self).__init__(*args, **kwargs)
 
         self.setWindowTitle('Unknown Port')
-        self.setText('There was a problem opening this port. Make sure ' \
-                      'the port isn\'t already open elsewhere and you ' \
-                      'have sufficient permissions.')
+        self.setText('There was a problem opening this port. Make sure '
+                     'the port isn\'t already open elsewhere and you '
+                     'have sufficient permissions.')
         self.setIcon(QMessageBox.Information)
 
 
@@ -73,6 +73,6 @@ class FInvalidFixedBaudRate(QMessageBox):
         super(FInvalidFixedBaudRate, self).__init__(*args, **kwargs)
 
         self.setWindowTitle('Invalid Fixed Baud Rate')
-        self.setText('The fixed baud rate was not set. Make sure to set a valid '
-                     'fixed baud rate value.')
+        self.setText('The fixed baud rate was not set. Make sure to set a
+                     'valid fixed baud rate value.')
         self.setIcon(QMessageBox.Warning)
