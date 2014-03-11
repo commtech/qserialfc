@@ -414,7 +414,7 @@ class FExternalTransmit(FHBoxLayout, PortChangedTracker):
         self.spin_box.setSuffix(' frame')
         self.spin_box.setEnabled(False)
         self.spin_box.valueChanged.connect(self.spin_box_value_changed)
-        
+
         self.check_box.setCheckState(Qt.CheckState.Unchecked)
         self.check_box.stateChanged.connect(self.check_box_state_changed)
 
@@ -528,9 +528,6 @@ class FFixedBaudRate(FHBoxLayout, PortChangedTracker):
 
     def apply_changes(self, port):
         if self.check_box.isChecked():
-            error_title = 'Invalid Baud Rate'
-            error_text = 'Make sure to set a valid baud rate.'
-
             #TODO: Mayve more simplication
             if self.line_edit.text():
                 try:
