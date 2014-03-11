@@ -88,16 +88,18 @@ class PortForm(QDialog):
         self.close()
 
 if __name__ == '__main__':
-    # Create the Qt Application
     app = QApplication(sys.argv)
 
-    # Create and show the form
     form = PortForm()
     form.show()
 
-    # Try and set the default port after the form is already showing
-    default_port = 'COM3' if os.name == 'nt' else 'serialfc0'
-    form.port_name.set_port(default_port)
+    ports = sorted(list_ports.serialfcports())
+
+    if ports:
+        form.port_name.set_port(ports[0][1])
+    else:
+        form.port_name.set_port(None)
+        FNoPortsFound().exec_()
 
     # Run the main Qt loop
     sys.exit(app.exec_())

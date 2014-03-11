@@ -63,14 +63,6 @@ class FVBoxLayout(FBoxLayout):
         super(FVBoxLayout, self).__init__(QVBoxLayout, *args, **kwargs)
 
 
-#TODO: Switch to list_ports and remove this
-def is_serialfc_port(filename):
-    if filename.find('serialfc') != -1:
-        return True
-    else:
-        return False
-
-
 class FPortName(FHBoxLayout):
     port_changed = Signal(serialfc.Port)
     apply_changes = Signal(serialfc.Port)
@@ -82,12 +74,7 @@ class FPortName(FHBoxLayout):
 
         self.label = QLabel('Port')
 
-        #TODO: Cleanup if possible
-        if os.name == 'nt':
-            port_names = sorted([port[0] for port in list_ports.comports()])
-        else:
-            dev_nodes = os.listdir('/dev/')
-            port_names = sorted(list(filter(is_serialfc_port, dev_nodes)))
+        port_names = [x[1] for x in sorted(list_ports.serialfcports())]
 
         self.combo_box = QComboBox()
         self.combo_box.addItems(port_names)
@@ -125,7 +112,7 @@ class FPortName(FHBoxLayout):
                 FUnknownError().exec_()
 
         if self.port:
-            # The port was successfulyl opened at this point
+            # The port was successfully opened at this point
             try:
                 card_type = self.port._card_type
             except:
