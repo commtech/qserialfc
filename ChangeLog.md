@@ -1,5 +1,9 @@
 # ChangeLog
 
+## [v1.3.1](https://github.com/commtech/qserialfc/releases/tag/v1.3.1) (03/14/2014)
+- Only show SerialFC COM ports
+- Extend isochronous range to 10
+
 ## [v1.3.0](https://github.com/commtech/qserialfc/releases/tag/v1.3.0) (10/11/2013)
 - Added support for fixed baud rates
 
