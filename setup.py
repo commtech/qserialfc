@@ -20,5 +20,7 @@ executables = [
 
 setup(name='qserialfc',
       version='1.3.1',
+      description='Fastcom Serial GUI',
+      author='Commtech, Inc.',
       options=dict(build_exe=buildOptions),
       executables=executables)
